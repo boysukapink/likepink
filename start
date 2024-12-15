@@ -1,0 +1,4 @@
+clear 
+
+rm -rf *.session* unknown*
+python3 main.py
