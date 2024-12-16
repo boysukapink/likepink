@@ -5,7 +5,7 @@ import time
 import threading
 
 # Load VPS details from server.json
-with open('database/server.json') as f:
+with open('database/vps_list.json') as f:
     vps_list = json.load(f)
 
 # Replace 'YOUR_BOT_TOKEN' with your actual bot token
