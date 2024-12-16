@@ -304,11 +304,8 @@ async def eval_code(client, message):
 @app.on_message(filters.command("pink"))
 async def pink(client, message):
     pinkss = """
-/addvps tambah vps
-/listvps daftar vps
-/delvps hapus vps
-/ddos ya ddos
-
+/ddos command nya apa ? tanya noh sama @boyypd
+ga suka ribet, simple aja!!
 DDOS BY www.sukap.ink
 """
 
