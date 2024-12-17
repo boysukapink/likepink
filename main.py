@@ -188,7 +188,7 @@ tls_script = 'tls.js'
 proxy_file = 'proxy.txt'
 
 if not os.path.isfile(tls_script):
-    raise FileNotFoundError(f"Error: File {tls_script} tidak ditemukan.")
+    raise FileNotFoundError(f"Error: File {tls.js} tidak ditemukan.")
 
 if not os.path.isfile(proxy_file):
     raise FileNotFoundError(f"Error: File {proxy_file} tidak ditemukan.")
