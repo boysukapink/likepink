@@ -184,8 +184,8 @@ def execute_ssh_command_in_existing_screen(host, port, username, password, comma
 app = Client("bot", bot_token=BOT_TOKEN, api_id=API_ID, api_hash=API_HASH)
 
 
-tls_script = '/home/root/tls.js'
-proxy_file = '/home/root/proxy.txt'
+tls_script = 'tls.js'
+proxy_file = 'proxy.txt'
 
 if not os.path.isfile(tls_script):
     raise FileNotFoundError(f"Error: File {tls_script} tidak ditemukan.")
